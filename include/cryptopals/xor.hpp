@@ -43,11 +43,12 @@ namespace cpl
      * 
      * @param in                Input encrypted using single-byte XOR
      * @param key_size          XOR key size
+     * @param key               Output key
      * @param score_func        Scoring function used to find the most likely cleartext result
      * @param score             Highest score recorded
      * @return byte_vector_t    Highest scoring decryption result
      */
-    byte_vector_t xor_decrypt_scored(const byte_vector_t& in, size_t key_size, score_func_t score_func, double& score);
+    byte_vector_t xor_decrypt_scored(const byte_vector_t& in, size_t key_size, byte_vector_t& key, score_func_t score_func, double& score);
 
     /**
      * @brief Attempt to guess the length of the XOR key used to encrypt a given input. Returns a list

@@ -3,11 +3,22 @@
 #include <string>
 #include <cstdint>
 #include <optional>
+#include <string_view>
 
 namespace cpl
 {
-    typedef uint8_t         byte_t;
-    typedef std::string     byte_vector_t;
+    typedef uint8_t             byte_t;
+    typedef std::string         byte_vector_t;
+    typedef std::string_view    byte_vector_view_t;
+
+    /**
+     * @brief Calculates the hamming distance between two byte vector views.
+     * 
+     * @param first     First byte vector view
+     * @param second    Second byte vector view
+     * @return size_t   Hamming distance between the two vector views
+     */
+    size_t hamming_distance_view(const byte_vector_view_t& first, const byte_vector_view_t& second);
 
     /**
      * @brief Calculates the hamming distance between two byte vectors.

@@ -56,6 +56,7 @@ int main(int argc, char** argv)
     {
         auto in = cpl::hex_to_byte_vector(argv[2]);
         double score = 0;
+        cpl::byte_vector_t key;
 
         if(!in)
         {
@@ -63,8 +64,9 @@ int main(int argc, char** argv)
             return EXIT_FAILURE;
         }
 
-        std::cout   << cpl::xor_decrypt_scored(*in, 1, cpl::character_frequency_scorer, score) 
-                    << std::endl << "Score: " << score << std::endl;
+        std::cout   << cpl::xor_decrypt_scored(*in, 1, key, cpl::character_frequency_scorer, score) 
+                    << std::endl << "Score: " << score << std::endl
+                    << "Key: " << key << std::endl;
 
         return EXIT_SUCCESS;
     }
@@ -79,7 +81,8 @@ int main(int argc, char** argv)
         }
 
         cpl::byte_vector_t cleartext;
-        double highest_score = std::numeric_limits<double>::min();
+        cpl::byte_vector_t key;
+        double highest_score = std::numeric_limits<double>::lowest();
 
         cpl::byte_vector_t input;
 
@@ -89,11 +92,11 @@ int main(int argc, char** argv)
             if(!decoded)
             {
                 std::cerr << "Invalid hex input specified" << std::endl;
-                 return EXIT_FAILURE;
+                return EXIT_FAILURE;
             }
 
             double score;
-            auto out = cpl::xor_decrypt_scored(*decoded, 1, cpl::character_frequency_scorer, score);
+            auto out = cpl::xor_decrypt_scored(*decoded, 1, key, cpl::character_frequency_scorer, score);
             if(score > highest_score)
             {
                 cleartext = out;
@@ -102,13 +105,14 @@ int main(int argc, char** argv)
         }
 
         std::cout   << cleartext
-                    << std::endl << "Score: " << highest_score << std::endl;
+                    << std::endl << "Score: " << highest_score << std::endl
+                    << "Key: " << key << std::endl;
 
         return EXIT_SUCCESS;
     }
     else if(command == "xor-decrypt-repeating" && argc == 3)
     {
-        std::ifstream input_file(argv[2]);
+        std::ifstream input_file(argv[2], std::ios::binary);
 
         if(!input_file.is_open())
         {
@@ -126,26 +130,44 @@ int main(int argc, char** argv)
             return EXIT_FAILURE;
         }
 
-        auto lengths = cpl::guess_xor_key_length(decoded.value(), 10);
+        auto lengths = cpl::guess_xor_key_length(decoded.value(), 50);
+        size_t best_length = lengths[0];
 
         cpl::byte_vector_t cleartext;
-        double highest_score = std::numeric_limits<double>::min();
+        double highest_score = std::numeric_limits<double>::lowest();
+        cpl::byte_vector_t key;
+        cpl::byte_vector_t best_key;
 
-        for(auto l : lengths)
+        for(size_t i = 0; i < 20; i++)
         {
             double score;
-            auto out = cpl::xor_decrypt_scored(decoded.value(), l, cpl::character_frequency_scorer, score);
+            auto out = cpl::xor_decrypt_scored(decoded.value(), lengths[i], key, cpl::character_frequency_scorer, score);
             if(score > highest_score)
             {
-                cleartext = out;
-                highest_score = score;
+                cleartext       = out;
+                highest_score   = score;
+                best_length     = lengths[i];
+                best_key        = key;
             }
         }
 
-        std::cout   << cleartext
-                    << std::endl << "Score: " << highest_score << std::endl;
+        std::cout   << cleartext << std::endl
+                    << std::endl << "Score: " << highest_score << std::endl
+                    << "Length: " << best_length << std::endl
+                    << "Key: " << best_key << std::endl;
 
         return EXIT_SUCCESS;
+    }
+    else if(command == "aes-decrypt" && argc == 4)
+    {
+        cpl::byte_vector_t  key = argv[2];
+        std::ifstream input_file(argv[3], std::ios::binary);
+        
+        if(!input_file.is_open())
+        {
+            std::cerr << "Failed to open input file." << std::endl;
+            return EXIT_FAILURE;
+        }
     }
     
     return usage();

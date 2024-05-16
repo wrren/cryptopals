@@ -53,9 +53,11 @@ namespace cpl
     {
         byte_vector_t out;
 
-        for(size_t i = 0; i < base64_string.length(); i++)
+        size_t i = 0;
+
+        for(auto it = base64_string.begin(); it != base64_string.end(); ++it)
         {
-            char c = base64_string[i];
+            char c = *it;
             char d = 0;
 
             if(c >= 'a' && c <= 'z')
@@ -108,6 +110,8 @@ namespace cpl
                 out.back() |= d;
                 break;
             }
+
+            ++i;
         }
 
         return out;

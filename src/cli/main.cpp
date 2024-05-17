@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cryptopals/encode.hpp>
 #include <cryptopals/xor.hpp>
+#include <cryptopals/aes.hpp>
 #include <fstream>
 #include <limits>
 #include <sstream>
@@ -110,9 +111,15 @@ int main(int argc, char** argv)
 
         return EXIT_SUCCESS;
     }
-    else if(command == "xor-decrypt-repeating" && argc == 3)
+    else if(command == "xor-decrypt-repeating" && argc >= 3)
     {
         std::ifstream input_file(argv[2], std::ios::binary);
+
+        size_t max_keysize = 40;
+        if(argc == 4)
+        {
+            max_keysize = std::stoull(argv[3]);
+        }
 
         if(!input_file.is_open())
         {
@@ -160,7 +167,7 @@ int main(int argc, char** argv)
     }
     else if(command == "aes-decrypt" && argc == 4)
     {
-        cpl::byte_vector_t  key = argv[2];
+        cpl::byte_vector_t key = argv[2];
         std::ifstream input_file(argv[3], std::ios::binary);
         
         if(!input_file.is_open())
@@ -168,6 +175,28 @@ int main(int argc, char** argv)
             std::cerr << "Failed to open input file." << std::endl;
             return EXIT_FAILURE;
         }
+
+        std::stringstream buffer;
+        buffer << input_file.rdbuf();
+
+        auto decoded = cpl::base64_to_byte_vector(buffer.str());
+        if(!decoded)
+        {
+            std::cerr << "Failed to decode input file contents from base64." << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        cpl::byte_vector_t decrypted;
+
+        if(!cpl::aes_ecb_decrypt(decoded.value(), key, decrypted))
+        {
+            std::cerr << "Failed to decrypt input file contents." << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        std::cout << decrypted << std::endl;
+
+        return EXIT_SUCCESS;
     }
     
     return usage();

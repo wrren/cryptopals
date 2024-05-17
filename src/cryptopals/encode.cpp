@@ -78,7 +78,7 @@ namespace cpl
             }
             else if(c == '+')
             {
-                d = 64;
+                d = 62;
             }
             else if(c == '=')
             {

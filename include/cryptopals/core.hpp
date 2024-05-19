@@ -4,12 +4,22 @@
 #include <cstdint>
 #include <optional>
 #include <string_view>
+#include <functional>
 
 namespace cpl
 {
     typedef uint8_t             byte_t;
     typedef std::string         byte_vector_t;
     typedef std::string_view    byte_vector_view_t;
+
+    /// @brief Decryption scoring function
+    typedef std::function<double (const byte_vector_t&, size_t, size_t)> score_func_t;
+
+    /**
+     * @brief Scoring function based on English character frequency.
+     * 
+     */
+    double character_frequency_scorer(const byte_vector_t&, size_t, size_t);
 
     /**
      * @brief Calculates the hamming distance between two byte vector views.
@@ -51,4 +61,13 @@ namespace cpl
 
         return set;
     }
+
+    /**
+     * @brief Pad the given input using PKCS#7 padding to the specified block size
+     * 
+     * @param in                Input Data
+     * @param block_size        Desired block size
+     * @return byte_vector_t    Padded input
+     */
+    byte_vector_t pad_pkcs7(const byte_vector_t& in, size_t block_size);
 }

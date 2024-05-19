@@ -43,13 +43,19 @@ int main(int argc, char** argv)
             return EXIT_FAILURE;
         }
 
-        std::cout << cpl::byte_vector_to_hex(cpl::xor_encrypt(*in, *pad)) << std::endl;
+        cpl::byte_vector_t encrypted;
+        cpl::xor_encrypt(*in, *pad, encrypted);
+
+        std::cout << cpl::byte_vector_to_hex(encrypted) << std::endl;
 
         return EXIT_SUCCESS;
     }
     else if(command == "xor-encrypt" && argc == 4)
     {
-        std::cout << cpl::byte_vector_to_hex(cpl::xor_encrypt(argv[2], argv[3])) << std::endl;
+        cpl::byte_vector_t encrypted;
+        cpl::xor_encrypt(argv[2], argv[3], encrypted);
+
+        std::cout << cpl::byte_vector_to_hex(encrypted) << std::endl;
 
         return EXIT_SUCCESS;
     }

@@ -10,6 +10,9 @@ namespace cpl
             return std::nullopt;
         }
 
+        auto filtered(hex_string);
+        filtered.erase(std::remove(filtered.begin(), filtered.end(), '\n'), filtered.end());
+
         auto char_to_byte = [](char h) -> std::optional<byte_t>
         {
             if(h >= '0' && h <= '9')
@@ -29,12 +32,12 @@ namespace cpl
         };
 
         byte_vector_t bytes;
-        bytes.reserve(hex_string.length() / 2);
+        bytes.reserve(filtered.length() / 2);
 
-        for(size_t i = 0; i < hex_string.length(); i += 2)
+        for(size_t i = 0; i < filtered.length(); i += 2)
         {
-            auto upper = char_to_byte(hex_string[i]);
-            auto lower = char_to_byte(hex_string[i+1]);
+            auto upper = char_to_byte(filtered[i]);
+            auto lower = char_to_byte(filtered[i+1]);
 
             if(upper.has_value() && lower.has_value())
             {
@@ -55,7 +58,10 @@ namespace cpl
 
         size_t i = 0;
 
-        for(auto it = base64_string.begin(); it != base64_string.end(); ++it)
+        auto filtered(base64_string);
+        filtered.erase(std::remove(filtered.begin(), filtered.end(), '\n'), filtered.end());
+
+        for(auto it = filtered.begin(); it != filtered.end(); ++it)
         {
             char c = *it;
             char d = 0;
@@ -83,10 +89,6 @@ namespace cpl
             else if(c == '=')
             {
                 d = 0;
-            }
-            else if(c == '\n')
-            {
-                continue;
             }
             else
             {

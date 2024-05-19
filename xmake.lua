@@ -1,6 +1,7 @@
 add_rules("mode.debug", "mode.release")
 add_requires("catch2")
 add_requires("openssl")
+add_requires("imgui", {configs = {glfw_opengl3 = true}})
 
 target("cli")
     set_kind("binary")
@@ -8,6 +9,14 @@ target("cli")
     add_includedirs("include")
     add_deps("cryptopals")
     add_packages("openssl")
+    set_languages("c++17")
+
+target("ui")
+    set_kind("binary")
+    add_files("src/ui/*.cpp")
+    add_includedirs("include")
+    add_deps("cryptopals")
+    add_packages("openssl", "imgui")
     set_languages("c++17")
 
 target("cryptopals")

@@ -17,4 +17,10 @@ TEST_CASE("core utility functions", "[core]")
         REQUIRE(cpl::hamming_distance({ 0x11 }, { 0x02 }) == 3);
         REQUIRE(cpl::hamming_distance("this is a test", "wokka wokka!!!") == 37);
     }
+
+    SECTION("PKCS#7 Padding")
+    {
+        REQUIRE(cpl::pad_pkcs7("YELLOW SUBMARINE", 20) == "YELLOW SUBMARINE\x04\x04\x04\x04");
+        REQUIRE(cpl::pad_pkcs7("YELLOW SUBMARINE", 24) == "YELLOW SUBMARINE\x08\x08\x08\x08\x08\x08\x08\x08");
+    }
 }
